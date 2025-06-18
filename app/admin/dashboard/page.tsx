@@ -1262,19 +1262,26 @@ export default function AdminDashboard() {
 
               {/* Sağ Taraf - Takvim */}
               <div className="space-y-4">
-                <div>
-                  <Label className="text-base font-medium mb-3 block">Tarih Düzenle *</Label>
-                  <div className="border rounded-lg p-4 bg-gray-50">
-                    <CalendarComponent
-                      selectedDate={new Date(editingAppointment.appointment_date)}
-                      onSelect={(date) => {
-                        if (date) {
-                          setEditingAppointment({ ...editingAppointment, appointment_date: date.toISOString() })
-                        }
-                      }}
-                      className="mx-auto"
-                    />
-                  </div>
+             <div>
+  <Label className="text-base font-medium mb-3 block">Tarih Düzenle *</Label>
+  <div className="border rounded-lg p-4 bg-gray-50">
+    <CalendarComponent
+      // selectedDate yerine artık 'selected' prop'unu kullanıyoruz.
+      // editingAppointment null veya undefined olabileceği için kontrol ekledik.
+      selected={editingAppointment ? new Date(editingAppointment.appointment_date) : undefined}
+      onSelect={(date) => {
+        if (editingAppointment) { // editingAppointment'ın varlığını kontrol etmeliyiz
+          if (date) {
+            setEditingAppointment({ ...editingAppointment, appointment_date: date.toISOString() });
+          } else {
+            // Eğer tarih seçimi kaldırılırsa, appointment_date'i de undefined yapabiliriz.
+            setEditingAppointment({ ...editingAppointment, appointment_date: undefined });
+          }
+        }
+      }}
+      className="mx-auto"
+    />
+</div>
                   <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     Seçilen tarih:{" "}
