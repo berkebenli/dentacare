@@ -1308,16 +1308,19 @@ export default function AdminDashboard() {
 />
 
 </div>
-                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1"> 
-                    <Calendar className="w-4 h-4" />
-                    Seçilen tarih:{" "}
-                    {new Date(editingAppointment.appointment_date).toLocaleDateString("tr-TR", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
+                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+  <Calendar className="w-4 h-4" />
+  Seçilen tarih:{" "}
+  {editingAppointment?.appointment_date
+    ? new Date(editingAppointment.appointment_date).toLocaleDateString("tr-TR", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Tarih seçilmedi"}
+</p>
+
                 </div>
               </div>
             </div>
