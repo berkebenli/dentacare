@@ -993,7 +993,10 @@ export default function AdminDashboard() {
                             <p className="flex items-center gap-2">
                               <Calendar className="h-4 w-4" />
                               <strong>Tarih:</strong>{" "}
-                              {new Date(appointment.appointment_date).toLocaleDateString("tr-TR")}
+                            {appointment.appointment_date
+  ? new Date(appointment.appointment_date).toLocaleDateString("tr-TR")
+  : "Tarih bilinmiyor"}
+
                             </p>
                           </div>
                           <div>
@@ -1003,7 +1006,10 @@ export default function AdminDashboard() {
                             </p>
                             <p className="text-sm text-gray-500">
                               <strong>Oluşturulma:</strong>{" "}
-                              {new Date(appointment.created_at).toLocaleDateString("tr-TR")}
+                              {appointment.created_at
+  ? new Date(appointment.created_at).toLocaleDateString("tr-TR")
+  : "Tarih yok"}
+
                             </p>
                           </div>
                         </div>
