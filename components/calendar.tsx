@@ -2,66 +2,68 @@
 
 import type * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, type DateRange, SelectSingleEventHandler } from "react-day-picker" // SelectSingleEventHandler'ı da import ettik
+// DateRange ve SelectSingleEventHandler'ı import ettiğinizden emin olun
+import { DayPicker, type DateRange, SelectSingleEventHandler } from "react-day-picker"
 import { tr } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
-// DayPicker'ın temel prop tiplerini alıyoruz
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+// DayPicker'ın temel prop tiplerini alıyoruz, ref'leri hariç tutarak daha temiz bir başlangıç yapıyoruz.
+export type CalendarProps = React.ComponentPropsWithoutRef<typeof DayPicker>
 
 export function CalendarComponent({
   className,
   classNames,
   showOutsideDays = true,
+  // selectedDate ve onSelect prop'larının tiplerini doğrudan burada belirliyoruz
   selectedDate,
-  onSelect, // Bu prop'un tipi değişecek
+  onSelect,
   ...props
 }: CalendarProps & {
-  selectedDate?: Date | undefined
-  // DayPicker'ın tekli seçim için beklediği onSelect tipi
-  // onSelect'i artık doğrudan DayPicker'ın beklediği SelectSingleEventHandler tipinde tanımlıyoruz.
-  onSelect?: SelectSingleEventHandler // <-- Burası değişti!
+  // `selected` prop'unun kesinlikle `Date | undefined` olacağını belirtiyoruz.
+  // Bu, DayPicker'ın `mode="single"` ile uyumlu olmasını sağlar.
+  selected?: Date | undefined;
+  // `onSelect` prop'unun `SelectSingleEventHandler` tipinde olacağını belirtiyoruz.
+  // Bu da DayPicker'ın `onSelect` callback'i ile tam uyum sağlar.
+  onSelect?: SelectSingleEventHandler;
 }) {
   // Bugünden önceki tarihleri devre dışı bırak
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0) // Bugünün başlangıcını almak için saat, dakika, saniye ve milisaniyeyi sıfırlıyoruz
 
   // handleSelect fonksiyonu DayPicker'ın onSelect'i için doğru tipe sahip olmalı
-  // Bu fonksiyon DayPicker'a doğrudan aktarılacak
   const handleSelect: SelectSingleEventHandler = (date, selectedDay, activeModifiers, e) => {
     // Dışarıya gönderilecek onSelect fonksiyonu yoksa çık
     if (!onSelect) return;
 
-    // date parametresi zaten Date | undefined tipinde geliyor çünkü mode="single"
-    // Tek yapmamız gereken onu dışarıya vermek, saat ayarlamasını da burada yapabiliriz.
+    // `mode="single"` olduğu için `date` parametresi zaten `Date | undefined` tipinde gelir.
+    // Saati ayarlayarak olası saat dilimi sorunlarını önleyelim.
     if (date) {
-      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
-      onSelect(adjustedDate, selectedDay, activeModifiers, e); // <-- onSelect prop'unu doğru parametrelerle çağırıyoruz
+      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); // Öğlen 12:00'ye ayarla
+      onSelect(adjustedDate, selectedDay, activeModifiers, e);
     } else {
       onSelect(undefined, selectedDay, activeModifiers, e);
     }
   };
 
-
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
-      locale={tr}
+      locale={tr} // Türkçe lokalizasyon kullanılıyor
       disabled={(date) => {
         const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
         // Geçmiş tarihleri ve hafta sonlarını devre dışı bırak
-        const isWeekend = checkDate.getDay() === 0 || checkDate.getDay() === 6
-        const isPast = checkDate < today
+        const isWeekend = checkDate.getDay() === 0 || checkDate.getDay() === 6 // 0: Pazar, 6: Cumartesi
+        const isPast = checkDate < today // Seçilen tarihin bugünden önce olup olmadığını kontrol et
 
-        return isPast || isWeekend
+        return isPast || isWeekend // Geçmiş veya hafta sonu ise devre dışı bırak
       }}
-      mode="single"
-      selected={selectedDate}
-      onSelect={handleSelect} // <-- handleSelect'i doğrudan DayPicker'a verdik
+      mode="single" // Tekli tarih seçimi modu
+      selected={selectedDate} // Seçili tarihi buraya iletiyoruz
+      onSelect={handleSelect} // Tarih seçildiğinde çalışacak fonksiyon
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
