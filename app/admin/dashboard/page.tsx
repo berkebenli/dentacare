@@ -42,7 +42,7 @@ import { DatePicker } from "@/components/date-picker"
 type Appointment = {
   id: string
   service: string
-  appointment_date: string
+  appointment_date: string | undefined; 
   time: string
   name: string
   phone: string
@@ -1274,7 +1274,7 @@ export default function AdminDashboard() {
           if (date) {
             setEditingAppointment({ ...editingAppointment, appointment_date: date.toISOString() });
           } else {
-            // Eğer tarih seçimi kaldırılırsa, appointment_date'i de undefined yapabiliriz.
+            // Eğer tarih seçimi kaldırılırsa, appointment_date'i de undefined yapabiliriz. Satır.
             setEditingAppointment({ ...editingAppointment, appointment_date: undefined });
           }
         }
@@ -1282,7 +1282,7 @@ export default function AdminDashboard() {
       className="mx-auto"
     />
 </div>
-                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1"> 
                     <Calendar className="w-4 h-4" />
                     Seçilen tarih:{" "}
                     {new Date(editingAppointment.appointment_date).toLocaleDateString("tr-TR", {
