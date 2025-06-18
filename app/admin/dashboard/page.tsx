@@ -170,8 +170,8 @@ export default function AdminDashboard() {
 
     // 2. Supabase insert kısmını güncelliyoruz:
     // newAppointment.date burada bir Date nesnesi olduğundan emin olduğumuz için (validasyon sayesinde),
-    // toISOString() metodunu güvenle çağırabiliriz.
-    const { data, error } = await supabase
+    // toISOString() metodunu güvenle çağırabiliriz. Güncelleeee.
+    const { data, error } = await supabase 
       .from("appointments")
       .insert({
         service: newAppointment.service,
