@@ -177,7 +177,7 @@ export default function AdminDashboard() {
         service: newAppointment.service,
         // Hata buradaydı: newAppointment.date'in bir Date objesi olduğundan emin olmalıyız.
         // Validasyonda zaten !newAppointment.date ile kontrol ettiğimiz için, buraya geldiğimizde
-        // newAppointment.date'in undefined olmadığını biliyoruz.
+        // newAppointment.date'in undefined olmadığını biliyoruz. güncel.
         appointment_date: (newAppointment.date as Date).toISOString(), // <-- BURASI DÜZELTİLDİ
         time: newAppointment.time,
         name: newAppointment.name,
