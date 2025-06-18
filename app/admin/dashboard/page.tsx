@@ -208,7 +208,7 @@ export default function AdminDashboard() {
     setIsAddModalOpen(false);
     alert("Randevu başarıyla eklendi!");
   } catch (error) {
-    console.error("Randevu eklenirken hata:", error);
+    console.error("Randevu eklenirken hata:", error); //Güncel
     alert("Randevu eklenirken hata oluştu!");
   }
 };
