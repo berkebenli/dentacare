@@ -152,55 +152,66 @@ export default function AdminDashboard() {
   }
 
   const handleAddAppointment = async () => {
-    try {
-      if (
-        !newAppointment.name ||
-        !newAppointment.phone ||
-        !newAppointment.email ||
-        !newAppointment.service ||
-        !newAppointment.date ||
-        !newAppointment.time
-      ) {
-        alert("Lütfen tüm zorunlu alanları doldurun!")
-        return
-      }
+  try {
+    // 1. Validasyon kısmını güncelliyoruz:
+    // newAppointment.date bir Date | undefined olduğu için, sadece 'undefined' olmadığını kontrol etmek yeterli.
+    // Ancak toISOString() çağrılmadan önce bir Date nesnesi olduğundan emin olmalıyız.
+    if (
+      !newAppointment.name ||
+      !newAppointment.phone ||
+      !newAppointment.email ||
+      !newAppointment.service ||
+      !newAppointment.date || // Bu kontrol zaten newAppointment.date'in falsy (undefined veya null) olup olmadığını kontrol eder.
+      !newAppointment.time
+    ) {
+      alert("Lütfen tüm zorunlu alanları doldurun!");
+      return;
+    }
 
-      const { data, error } = await supabase
-        .from("appointments")
-        .insert({
-          service: newAppointment.service,
-          appointment_date: newAppointment.date.toISOString(),
-          time: newAppointment.time,
-          name: newAppointment.name,
-          phone: newAppointment.phone,
-          email: newAppointment.email,
-          notes: newAppointment.notes,
-          status: newAppointment.status,
-        })
-        .select()
-
-      if (error) throw error
-
-      await fetchData()
-
-      setNewAppointment({
-        service: "",
-        date: undefined,
-        time: "",
-        name: "",
-        phone: "",
-        email: "",
-        notes: "",
+    // 2. Supabase insert kısmını güncelliyoruz:
+    // newAppointment.date burada bir Date nesnesi olduğundan emin olduğumuz için (validasyon sayesinde),
+    // toISOString() metodunu güvenle çağırabiliriz.
+    const { data, error } = await supabase
+      .from("appointments")
+      .insert({
+        service: newAppointment.service,
+        // Hata buradaydı: newAppointment.date'in bir Date objesi olduğundan emin olmalıyız.
+        // Validasyonda zaten !newAppointment.date ile kontrol ettiğimiz için, buraya geldiğimizde
+        // newAppointment.date'in undefined olmadığını biliyoruz.
+        appointment_date: (newAppointment.date as Date).toISOString(), // <-- BURASI DÜZELTİLDİ
+        time: newAppointment.time,
+        name: newAppointment.name,
+        phone: newAppointment.phone,
+        email: newAppointment.email,
+        notes: newAppointment.notes,
         status: "confirmed",
       })
+      .select();
 
-      setIsAddModalOpen(false)
-      alert("Randevu başarıyla eklendi!")
-    } catch (error) {
-      console.error("Randevu eklenirken hata:", error)
-      alert("Randevu eklenirken hata oluştu!")
-    }
+    if (error) throw error;
+
+    await fetchData();
+
+    // 3. setNewAppointment kısmını güncelliyoruz:
+    // Date: undefined olarak bırakmak Type hatasına yol açıyorsa, açıkça tipini belirtiyoruz.
+    setNewAppointment({
+      service: "",
+      date: undefined as Date | undefined, // <-- BURASI DÜZELTİLDİ
+      time: "",
+      name: "",
+      phone: "",
+      email: "",
+      notes: "",
+      status: "confirmed",
+    });
+
+    setIsAddModalOpen(false);
+    alert("Randevu başarıyla eklendi!");
+  } catch (error) {
+    console.error("Randevu eklenirken hata:", error);
+    alert("Randevu eklenirken hata oluştu!");
   }
+};
 
   const handleEditAppointment = async () => {
     try {
