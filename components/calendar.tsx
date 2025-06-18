@@ -16,28 +16,41 @@ export function CalendarComponent({
   className,
   classNames,
   showOutsideDays = true,
-  // selectedDate ve onSelect prop'larının tiplerini doğrudan burada belirliyoruz
- selected,
+  // Artık 'selected' prop'u kullanıyoruz.
+  selected,
   onSelect,
   ...props
 }: CalendarProps & {
+  // Bu component, tek tarih seçimi için Date tipinde bir 'selected' prop'u alıyor.
   selected?: Date | undefined;
   onSelect?: SelectSingleEventHandler;
 }) {
-
   // Bugünden önceki tarihleri devre dışı bırak
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Bugünün başlangıcını almak için saat, dakika, saniye ve milisaniyeyi sıfırlıyoruz
 
   // handleSelect fonksiyonu DayPicker'ın onSelect'i için doğru tipe sahip olmalı
   const handleSelect: SelectSingleEventHandler = (date, selectedDay, activeModifiers, e) => {
-    // Dışarıya gönderilecek onSelect fonksiyonu yoksa çık
     if (!onSelect) return;
 
-    // `mode="single"` olduğu için `date` parametresi zaten `Date | undefined` tipinde gelir.
-    // Saati ayarlayarak olası saat dilimi sorunlarını önleyelim.
-    if (date) {
-      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12); // Öğlen 12:00'ye ayarla
+    // Eğer date parametresi bir DateRange nesnesi gelirse (tek modda pek beklenmez ama olabilir), 'from' tarihini kullanıyoruz.
+    if (date && typeof date === "object" && "from" in date && date.from instanceof Date) {
+      const adjustedDate = new Date(
+        date.from.getFullYear(),
+        date.from.getMonth(),
+        date.from.getDate(),
+        12
+      );
+      onSelect(adjustedDate, selectedDay, activeModifiers, e);
+    }
+    // Eğer date direkt Date tipinde geliyorsa:
+    else if (date instanceof Date) {
+      const adjustedDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        12
+      );
       onSelect(adjustedDate, selectedDay, activeModifiers, e);
     } else {
       onSelect(undefined, selectedDay, activeModifiers, e);
@@ -48,19 +61,20 @@ export function CalendarComponent({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
-      locale={tr} // Türkçe lokalizasyon kullanılıyor
+      locale={tr}
       disabled={(date) => {
-        const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+        const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
         // Geçmiş tarihleri ve hafta sonlarını devre dışı bırak
-        const isWeekend = checkDate.getDay() === 0 || checkDate.getDay() === 6 // 0: Pazar, 6: Cumartesi
-        const isPast = checkDate < today // Seçilen tarihin bugünden önce olup olmadığını kontrol et
+        const isWeekend = checkDate.getDay() === 0 || checkDate.getDay() === 6;
+        const isPast = checkDate < today;
 
-        return isPast || isWeekend // Geçmiş veya hafta sonu ise devre dışı bırak
+        return isPast || isWeekend;
       }}
-      mode="single" // Tekli tarih seçimi modu
-      selected={selected} // Seçili tarihi buraya iletiyoruz
-      onSelect={handleSelect} // Tarih seçildiğinde çalışacak fonksiyon
+      mode="single"
+      // Eğer 'selected' değeri varsa, DayPicker "selected" propuna DateRange formatında gönderiyoruz.
+      selected={selected ? ({ from: selected } as DateRange) : undefined}
+      onSelect={handleSelect} //onselect altı cizili
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -92,10 +106,10 @@ export function CalendarComponent({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />, //IconLeft props altı çizili
+        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />, //props altı çizili 
       }}
       {...props}
     />
   )
-}
+} 
