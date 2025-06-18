@@ -22,16 +22,21 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <main className="flex-grow">{children}</main>
             <footer className="text-center text-sm text-gray-500 py-4 border-t group">
-              <span className="inline-block animate-spin-slow hover:rotate-180 transition-transform duration-500">
-                🦷
-              </span>
-              <span className="mx-2 inline-block animate-pulse-heart text-red-500">
-                ❤️
-              </span>
-              <span className="font-medium group-hover:text-black transition-colors duration-300">
-                2025 Berke Benli & Elif Alınca & Göktuğ Ormanlı
-              </span>
-            </footer>
+  <span className="text-xl inline-block transition-transform duration-500 group-hover:rotate-[360deg]">
+    🦷
+  </span>
+  <span className="text-xl mx-1 inline-block animate-pulse group-hover:scale-110 transition-transform duration-500">
+    ❤️
+  </span>
+  2025 Berke Benli & Elif Alınca & Göktuğ Ormanlı
+  <span className="text-xl mx-1 inline-block animate-pulse group-hover:scale-110 transition-transform duration-500">
+    ❤️
+  </span>
+  <span className="text-xl inline-block transition-transform duration-500 group-hover:rotate-[360deg]">
+    🦷
+  </span>
+</footer>
+
           </div>
         </ThemeProvider>
       </body>
