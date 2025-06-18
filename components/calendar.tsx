@@ -17,17 +17,14 @@ export function CalendarComponent({
   classNames,
   showOutsideDays = true,
   // selectedDate ve onSelect prop'larının tiplerini doğrudan burada belirliyoruz
-  selectedDate,
+ selected,
   onSelect,
   ...props
 }: CalendarProps & {
-  // `selected` prop'unun kesinlikle `Date | undefined` olacağını belirtiyoruz.
-  // Bu, DayPicker'ın `mode="single"` ile uyumlu olmasını sağlar.
   selected?: Date | undefined;
-  // `onSelect` prop'unun `SelectSingleEventHandler` tipinde olacağını belirtiyoruz.
-  // Bu da DayPicker'ın `onSelect` callback'i ile tam uyum sağlar.
   onSelect?: SelectSingleEventHandler;
 }) {
+
   // Bugünden önceki tarihleri devre dışı bırak
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Bugünün başlangıcını almak için saat, dakika, saniye ve milisaniyeyi sıfırlıyoruz
@@ -62,7 +59,7 @@ export function CalendarComponent({
         return isPast || isWeekend // Geçmiş veya hafta sonu ise devre dışı bırak
       }}
       mode="single" // Tekli tarih seçimi modu
-      selected={selectedDate} // Seçili tarihi buraya iletiyoruz
+      selected={selected} // Seçili tarihi buraya iletiyoruz
       onSelect={handleSelect} // Tarih seçildiğinde çalışacak fonksiyon
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
