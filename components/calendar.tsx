@@ -2,12 +2,13 @@
 
 import type * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, type DateRange } from "react-day-picker" // DateRange'i buradan import ediyoruz
+import { DayPicker, type DateRange, SelectSingleEventHandler } from "react-day-picker" // SelectSingleEventHandler'ı da import ettik
 import { tr } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
+// DayPicker'ın temel prop tiplerini alıyoruz
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 export function CalendarComponent({
@@ -15,39 +16,34 @@ export function CalendarComponent({
   classNames,
   showOutsideDays = true,
   selectedDate,
-  // onSelect prop'unun tipini Date | DateRange | undefined olarak güncelliyoruz
-  onSelect,
+  onSelect, // Bu prop'un tipi değişecek
   ...props
 }: CalendarProps & {
   selectedDate?: Date | undefined
-  // Buradaki onSelect'in de tipini Date | undefined olarak tutmaya devam edelim
-  // çünkü dışarıya hep Date döneceğiz.
-  onSelect?: (date: Date | undefined) => void
+  // DayPicker'ın tekli seçim için beklediği onSelect tipi
+  // onSelect'i artık doğrudan DayPicker'ın beklediği SelectSingleEventHandler tipinde tanımlıyoruz.
+  onSelect?: SelectSingleEventHandler // <-- Burası değişti!
 }) {
   // Bugünden önceki tarihleri devre dışı bırak
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // handleSelect fonksiyonunun tipini, DayPicker'ın onSelect'inin beklediği gibi yapıyoruz
-  const handleSelect = (date: Date | DateRange | undefined) => {
-    // Dışarıya göndereceğimiz onSelect fonksiyonu yoksa veya date tanımsızsa çık
-    if (!onSelect) return
+  // handleSelect fonksiyonu DayPicker'ın onSelect'i için doğru tipe sahip olmalı
+  // Bu fonksiyon DayPicker'a doğrudan aktarılacak
+  const handleSelect: SelectSingleEventHandler = (date, selectedDay, activeModifiers, e) => {
+    // Dışarıya gönderilecek onSelect fonksiyonu yoksa çık
+    if (!onSelect) return;
 
-    let selectedResultDate: Date | undefined = undefined;
-
-    // Eğer date bir DateRange nesnesiyse (genellikle "range" modunda gelir)
-    if (typeof date === "object" && date !== null && "from" in date && date.from instanceof Date) {
-      // Tekli seçimde "DateRange" gelme ihtimaline karşı from'u kullanıyoruz
-      selectedResultDate = new Date(date.from.getFullYear(), date.from.getMonth(), date.from.getDate(), 12);
+    // date parametresi zaten Date | undefined tipinde geliyor çünkü mode="single"
+    // Tek yapmamız gereken onu dışarıya vermek, saat ayarlamasını da burada yapabiliriz.
+    if (date) {
+      const adjustedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+      onSelect(adjustedDate, selectedDay, activeModifiers, e); // <-- onSelect prop'unu doğru parametrelerle çağırıyoruz
+    } else {
+      onSelect(undefined, selectedDay, activeModifiers, e);
     }
-    // Eğer date doğrudan bir Date nesnesiyse (tekli seçimde beklenir)
-    else if (date instanceof Date) {
-      selectedResultDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
-    }
+  };
 
-    // Dışarıya prop olarak verilen onSelect fonksiyonunu çağırıyoruz
-    onSelect(selectedResultDate);
-  }
 
   return (
     <DayPicker
@@ -65,8 +61,7 @@ export function CalendarComponent({
       }}
       mode="single"
       selected={selectedDate}
-      // DayPicker'ın onSelect'ine, yukarıda tanımladığımız handleSelect'i veriyoruz
-      onSelect={handleSelect}
+      onSelect={handleSelect} // <-- handleSelect'i doğrudan DayPicker'a verdik
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
