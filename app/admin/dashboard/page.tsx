@@ -42,7 +42,7 @@ import { DatePicker } from "@/components/date-picker"
 type Appointment = {
   id: string
   service: string
-  appointment_date: string | undefined; //Güncelleme 
+  appointment_date: string | undefined; //Güncelleme geldi
   time: string
   name: string
   phone: string
